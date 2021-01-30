@@ -1,6 +1,6 @@
 {
   "name": "usetube-improved",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "crawl youtube with scraperapi without a YouTube api key (search videos, search channels, get all channel/playlist's videos)",
   "main": "index.js",
   "dependencies": {
@@ -12,8 +12,8 @@
     "typescript": "4.0.3"
   },
   "scripts": {
-    "build": "npx tsc --build && npx minify dist/index.js > dist/index.min.js && rm dist/index.js && mv dist/index.min.js dist/index.js && cp package.json dist/package.json",
-    "publish": "yarn build && npm publish ./dist --access public"
+    "build": "npx tsc --build && npx minify dist/index.js > dist/index.min.js && rm dist/index.js && mv dist/index.min.js dist/index.js && cp package.json dist/package.json && cp README.md dist/README.md ",
+    "release": "npm publish ./dist --access public"
   },
   "repository": {
     "type": "git",
