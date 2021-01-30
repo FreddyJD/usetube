@@ -1,72 +1,58 @@
-# **Usetube.js**
+# usetube-improved
+Production-ready integrated with the most used scrapper [scrapper-api](https://www.scraperapi.com/?fp_ref=freddyfalso)  so you can scrape YouTube data without any issues of getting blocked. 
 
-[![Version](https://img.shields.io/npm/v/usetube.svg)](https://www.npmjs.com/package/usetube)
-[![Downloads](https://img.shields.io/npm/dt/usetube.svg)](https://www.npmjs.com/package/usetube)
-[![Downloads](https://img.shields.io/npm/dw/usetube)](https://www.npmjs.com/package/usetube)
+[![image info](https://i.imgur.com/ew6uFeQ.png)](https://www.scraperapi.com/?fp_ref=freddyfalso)
 
-### with usetube you Crawl youtube so you can **search videos** or **channels**, you can also **grab all channel's videos** at once
-
-### This script is **google api key free** (so you don't need google account)
-
-### This script is **google Quota free** (you can retrieve all videos a channel can give you)
-
-<br>
+# providers
+scraperapi = [https://www.scraperapi.com](https://www.scraperapi.com/?fp_ref=freddyfalso)
+(SOON) ScrapeBee = [https://www.scrapingbee.com/](https://www.scrapingbee.com/)
 
 # install
 ```shell
-npm install usetube
+npm install usetube-improved
 ```
 
-# usage
-
+# Working example 
 ```js
-const usetube = require('usetube')
-await usetube.searchVideo('IMANU')
+const usetube = require('usetube-improved');
+
+const data = await usetube.searchVideo('hello world', 'api-key-123');
+
+console.log(data);
 ```
 
-# types definitions
+# Usage
 ```js
-searchVideo(terms: String!, token: String?): [video], didyoumean, token
+// Example
+await searchVideo(terms, api_key, token)
+await searchVideo('awesome cats', 'cool-api-123')
 
-searchChannel(terms: String!, token: String?): [channel], didyoumean, token
+// Example
+await searchChannel(terms, api_key, token)
+await searchChannel('FinanceChannel123', 'cool-api-123')
 
-getChannelVideos(channel_id: String!, published_after: Date?): [video]
+// Example
+await getChannelVideos(channel_id, api_key, published_after)
+await getChannelVideos('UCkHja3RPRoq3e_YNp1IEyEA', 'cool-api-123', new Date())
 
-getPlaylistVideos(playlist_id: String!): [video]
+// Example
+await getPlaylistVideos(playlist_id, api_key)
+await getPlaylistVideos('RDQMgEzdN5RuCXE', 'cool-api-123')
 
-getChannelDesc(channel_id: String!): String
+// Example
+await getChannelDesc(channel_id, api_key)
+await getChannelDesc('UCkHja3RPRoq3e_YNp1IEyEA', 'cool-api-123')
 
-getVideoDesc(video_id: String!): String
+// Example
+await getVideoDesc(video_id, api_key)
+await getVideoDesc('a9xHJjMxQ8', 'cool-api-123')
 
-getVideoDate(video_id: String!): Date
+// Example
+await getVideoDate(video_id, api_key)
+await getVideoDate('a9xHJjMxQ8', 'cool-api-123')
 
-getVideosFromDesc(video_id: String!): [video]
-```
+// Example
+await getVideosFromDesc(video_id, api_key)
+await getVideosFromDesc('a9xHJjMxQ8', 'cool-api-123')
 
-```js
-video {
-  id:                    String(11),
-  original_title:        String,
-  title:                 String,
-  artist:                String,
-  duration:              Int,
-  publishedAt:           Date,
-}
-```
-```js
-channel {
-  name:                  String,
-  channel_id:            String,
-  nb_videos:             Int,
-  nb_subscriber:         Int,
-  official:              Boolean,
-  channel_avatar_small:  String,
-  channel_avatar_medium: String,
-}
-```
-```js
-didyoumean:              String, // spelling proposal
-```
-```js
-token:                   String, // key to get more data (next/prev page result)
 ```
