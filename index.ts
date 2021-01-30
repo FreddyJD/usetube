@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
+import { POINT_CONVERSION_COMPRESSED } from 'constants'
 import * as moment from 'moment'
 
 export = {
@@ -73,7 +74,9 @@ function formatYoutubeCount(raw) {
 
 async function getVideoDate(id: string, api_key: string) {
   try {
-    const body: any = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/watch?v=' + id, headers)).data as string
+    let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/watch?v=' + id + '&keep_headers=true', headers)
+    body = body.data as string
+
     let publishText: any = dateRegex.exec(body)?.[1] || '{}'
     publishText += ' ' + Math.floor(Math.random() * 24) + '-' + Math.floor(Math.random() * 60) + '-' + Math.floor(Math.random() * 60)
     return moment(publishText, 'YYYY-MM-DD H-m-s').toDate()
@@ -85,7 +88,9 @@ async function getVideoDate(id: string, api_key: string) {
 
 async function getVideoDesc(id: string, api_key: string) {
   try {
-    const body: any = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/watch?v=' + id, headers)).data as string
+    let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/watch?v=' + id + '&keep_headers=true', headers)
+    body = body.data as string
+
     const raw: any = mobileRegex.exec(body)?.[1] || '{}'
     const data: any = JSON.parse(decodeHex(raw))
     let description: string = data.contents?.singleColumnWatchNextResults?.results?.results?.contents[1]?.itemSectionRenderer?.contents[0]?.slimVideoMetadataRenderer?.description?.runs || ''
@@ -98,7 +103,9 @@ async function getVideoDesc(id: string, api_key: string) {
 
 async function getChannelDesc(id: string, api_key: string) {
   try {
-    const body: any = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/channel/' + id + '/videos', headers)).data as string
+    let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/channel/' + id + '/videos' + '&keep_headers=true', headers)
+    body = body.data as string
+
     const raw: any = mobileRegex.exec(body)?.[1] || '{}'
     const data: any = JSON.parse(decodeHex(raw))
     let description: string = data.metadata?.channelMetadataRenderer?.description || ''
@@ -116,7 +123,9 @@ async function searchVideo(terms: string, api_key: string, token?: string) {
     let didyoumean: String = ''
     // initial videos search
     if (!token) {
-      let body: any = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/results?sp=EgIQAQ%253D%253D&videoEmbeddable=true&search_query=' + encodeURI(terms), headers)).data as string
+      let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/results?sp=EgIQAQ%253D%253D&videoEmbeddable=true&search_query=' + encodeURI(terms) + '&keep_headers=true', headers)
+      body = body.data as string
+
       let raw: any = mobileRegex.exec(body)?.[1] || '{}'
       // let fs = require('fs'); fs.writeFile('wow.json', decodeHex(raw), (e)=>{console.log(e)})
       let datas: any = JSON.parse(decodeHex(raw)).contents.sectionListRenderer
@@ -125,7 +134,9 @@ async function searchVideo(terms: string, api_key: string, token?: string) {
     }
     // more videos
     else {
-      let data = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://youtube.com/browse_ajax?ctoken=' + token, headersAJAX)).data
+      let data: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://youtube.com/browse_ajax?ctoken=' + token + '&keep_headers=true', headersAJAX)
+      data = data.data as string
+      
       items = data[1].response.continuationContents?.gridContinuation?.items || ''
       token = data[1].response.continuationContents?.gridContinuation?.continuations?.[0]?.nextContinuationData?.continuation || ''
     }
@@ -155,14 +166,18 @@ async function searchChannel(terms: string, api_key: string, token?: string) {
     let channels: any = []
     let didyoumean: String = ''
     if (!token) {
-      const body: any = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/results?sp=CAASAhAC&search_query=' + encodeURI(terms), headers)).data as string
+      let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/results?sp=CAASAhAC&search_query=' + encodeURI(terms) + '&keep_headers=true', headers)
+      body = body.data as string
+
       const raw: any = mobileRegex.exec(body)?.[1] || '{}'
       const data: any = JSON.parse(decodeHex(raw))
       items = data.contents.sectionListRenderer?.contents[0]?.itemSectionRenderer?.contents
       token = data.continuations?.[0]?.reloadContinuationData?.continuation || ''
     }
     else {
-      let data = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://youtube.com/browse_ajax?ctoken=' + token, headersAJAX)).data
+      let data: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://youtube.com/browse_ajax?ctoken=' + token + '&keep_headers=true', headersAJAX)
+      data = data.data as string
+
       items = data[1].response.continuationContents?.gridContinuation?.items || ''
       token = data[1].response.continuationContents?.gridContinuation?.continuations?.[0]?.nextContinuationData?.continuation || ''
     }
@@ -211,9 +226,9 @@ async function searchChannel(terms: string, api_key: string, token?: string) {
 
 async function getChannelVideos(id: string, api_key: string, published_after?: Date) {
   try {
-    const body: any = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/channel/' + id + '/videos', headers)).data as string
+    let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/channel/' + id + '/videos' + '&keep_headers=true', headers)
+    body = body.data as string
     const raw: any = mobileRegex.exec(body)?.[1] || '{}'
-    // let fs = require('fs'); fs.writeFile('wow.json', decodeHex(raw), (e)=>{console.log(e)})
     const data: any = JSON.parse(decodeHex(raw))
     const items: any = data.contents?.singleColumnBrowseResultsRenderer?.tabs[1]?.tabRenderer?.content?.sectionListRenderer?.contents[0]?.itemSectionRenderer
     let token: string = items.continuations?.[0]?.nextContinuationData?.continuation || ''
@@ -230,7 +245,10 @@ async function getChannelVideos(id: string, api_key: string, published_after?: D
     while (token !== '') {
       try {
         wait()
-        let data = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://youtube.com/browse_ajax?ctoken=' + token, headersAJAX)).data
+
+        let data: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://youtube.com/browse_ajax?ctoken=' + token + '&keep_headers=true', headersAJAX)
+        data = data.data as string
+        
         let newVideos: any = data[1]?.response?.continuationContents?.gridContinuation?.items || ''
         token = data[1].response.continuationContents?.gridContinuation?.continuations?.[0]?.nextContinuationData?.continuation || ''
         for (let i = 0; i < newVideos.length; i++) {
@@ -257,7 +275,10 @@ async function getChannelVideos(id: string, api_key: string, published_after?: D
 
 async function getPlaylistVideos(id: string, api_key: string, speedDate?: boolean) {
   try {
-    const body: any = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/playlist?list=' + id, headers)).data as string
+
+    let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/playlist?list=' + id + '&keep_headers=true', headers)
+    body = body.data as string
+
     const raw: any = mobileRegex.exec(body)?.[1] || '{}'
     const data: any = JSON.parse(decodeHex(raw))
     const items: any = data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents[0]?.itemSectionRenderer?.contents[0]?.playlistVideoListRenderer || ''
@@ -269,7 +290,10 @@ async function getPlaylistVideos(id: string, api_key: string, speedDate?: boolea
     while (token !== '') {
       try {
         wait()
-        const body: any = (await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/playlist?ctoken=' + token, headers)).data as string
+
+        let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/playlist?ctoken=' + token + '&keep_headers=true', headers)
+        body = body.data as string
+        
         let nextRaw: any = mobileRegex.exec(body)?.[1] || '{}'
         let nextData: any = JSON.parse(decodeHex(nextRaw)).continuationContents.playlistVideoListContinuation
         let nextVideos: any = nextData.contents
