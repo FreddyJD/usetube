@@ -224,47 +224,17 @@ async function searchChannel(terms: string, api_key: string, token?: string) {
   }
 }
 
-async function getChannelVideos(id: string, api_key: string, published_after?: Date) {
+async function getChannelVideos(id: string, api_key: string) {
   try {
     let body: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://m.youtube.com/channel/' + id + '/videos' + '&keep_headers=true', headers)
     body = body.data as string
     const raw: any = mobileRegex.exec(body)?.[1] || '{}'
     const data: any = JSON.parse(decodeHex(raw))
     const items: any = data.contents?.singleColumnBrowseResultsRenderer?.tabs[1]?.tabRenderer?.content?.sectionListRenderer?.contents[0]?.itemSectionRenderer
-    let token: string = items.continuations?.[0]?.nextContinuationData?.continuation || ''
     let videos: any = []
     for (let i = 0; i < items.contents.length; i++) {
       let video = await formatVideo(items.contents[i], api_key, false)
-      if (moment(video.publishedAt).isBefore(published_after) && published_after) {
-        return videos
-      }
-      else {
         videos.push(video)
-      }
-    }
-    while (token !== '') {
-      try {
-        wait()
-
-        let data: any = await axios.get('http://api.scraperapi.com?api_key=' + api_key + '&url=https://youtube.com/browse_ajax?ctoken=' + token + '&keep_headers=true', headersAJAX)
-        data = data.data as string
-        
-        let newVideos: any = data[1]?.response?.continuationContents?.gridContinuation?.items || ''
-        token = data[1].response.continuationContents?.gridContinuation?.continuations?.[0]?.nextContinuationData?.continuation || ''
-        for (let i = 0; i < newVideos.length; i++) {
-          let video = await formatVideo(newVideos[i], api_key, false)
-          if (moment(video.publishedAt).isBefore(published_after) && published_after) {
-            return videos
-          }
-          else {
-            videos.push(video)
-          }
-        }
-      } catch (e) {
-        console.error('getChannelVideos failed')
-        console.error(e)
-        token = ''
-      }
     }
     return videos
   } catch (e) {
