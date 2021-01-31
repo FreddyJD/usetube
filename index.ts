@@ -314,7 +314,6 @@ async function getVideosFromDesc(yt_id, api_key: string) {
             let track = tracksSearched.tracks[y]
             let original_title_lower = track.original_title.toLowerCase()
             if (original_title_lower.includes(artist.split(' ')[0].toLowerCase()) && original_title_lower.includes(title.split(' ')[0].toLowerCase())) {
-              track.publishedAt = await getVideoDate(track.id, api_key)
               track.title = title
               track.artist = artist
               tracks.push(track)
@@ -383,14 +382,12 @@ async function formatVideo(video: any, api_key: string, speedDate?: boolean) {
       let minutes: number = parseInt(durationDatas[0]) * 60
       let seconds: number = parseInt(durationDatas[1])
       // Date formating
-      let publishedAt = !speedDate ? await getVideoDate(id, api_key) : video.publishedTimeText?.runs[0].text || ''
       return {
         id: id,
         original_title: video.original_title.trim(),
         title: video.title.trim(),
         artist: video.artist.trim(),
         duration: minutes + seconds,
-        publishedAt: publishedAt,
       }
     }
     else if (video.didYouMeanRenderer || video.showingResultsForRenderer) {
@@ -400,7 +397,6 @@ async function formatVideo(video: any, api_key: string, speedDate?: boolean) {
         title: video.correctedQuery.runs[0].text,
         artist: '',
         duration: 0,
-        publishedAt: '',
       }
     }
   } catch (e) {
